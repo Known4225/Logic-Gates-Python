@@ -32,7 +32,6 @@ NOT POWER POWER 0 0 90 -80 50 90 80 -50 90 0 0 1 0 0 0 1 0 0 1 2 0 1 0 0 1 1 0 1
 ToDo: 
 Undo/Redo commands (very difficult, might require compact encoding)
 Configurable keybinds - possibly just in code
-User interface/Sidebar - might be unecessary
 Custom gate creator
 Multiplexer component
 Triple (or more) input gates (currently incompatible with implementation, would require large reworks)
