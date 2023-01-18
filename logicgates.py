@@ -155,7 +155,7 @@ class master:
         if turtools.mouseDown():
             # print(self.selectOb)
             if not self.keys.count("mouse") > 0:
-                # print(self.inpComp)
+                print(self.io)
                 self.keys.append("mouse") 
                 if self.mx > self.boundXmin and self.mx < self.boundXmax and self.my > self.boundYmin and self.my < self.boundYmax:
                     self.mouseType = 0
@@ -758,7 +758,7 @@ class master:
                         self.io[i] = 0
                     else:
                         self.inpComp[i] = 0
-                        self.inpComp[i + 1] = 0
+                        self.io[i - 1] = 0
                 else:
                     if self.inpComp[i] > index:
                         self.inpComp[i] -= 1
@@ -766,9 +766,9 @@ class master:
                     self.io[i] = 0
             else:
                 if self.inpComp[i] > index:
-                        self.inpComp[i] -= 1
+                    self.inpComp[i] -= 1
                 if self.inpComp[i + 1] > index:
-                        self.inpComp[i + 1] -= 1
+                    self.inpComp[i + 1] -= 1
             i += 3
         self.components.pop(index)
         for i in range(3):
