@@ -155,7 +155,7 @@ class master:
         if turtools.mouseDown():
             # print(self.selectOb)
             if not self.keys.count("mouse") > 0:
-                print(self.io)
+                # print(self.io)
                 self.keys.append("mouse") 
                 if self.mx > self.boundXmin and self.mx < self.boundXmax and self.my > self.boundYmin and self.my < self.boundYmax:
                     self.mouseType = 0
