@@ -22,6 +22,7 @@ global globalsize, turtools, themeColors
 globalsize = 1.5
 t.setup(960, 720)
 t.colormode(255)
+t.title("Logic Gates")
 tps = 'inf' #set this to a different number to change the ticks per second, this changes things like how fast the scroll and rotate features work
 turtools = turtleTools(t.getcanvas(), -240, -180, 240, 180, True)
 themeColors = ['null', 0, 0, 0, 195, 195, 195, 255, 0, 0, 255, 146, 146, 230, 230, 230, 95, 95, 95, 255, 234, 0, 255, 248, 181, 255, 255, 255,
