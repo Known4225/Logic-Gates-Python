@@ -44,3 +44,7 @@ Tps variable (change your fps and tps)
 A fix for linux keyRelease events (buffer key system)
 scrollSpeed and rotateSpeed variables
 new streamlined key sensing (not applied universally, since the shift key was not having issues)
+
+Issue:
+Buffers don't work too well with high tps, but lowering the tps causes lag
+Fix: just use the JS version
