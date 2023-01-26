@@ -58,6 +58,8 @@ class turtleTools():
         self.cv.bind('<Button-2>', self.mouse3)
         self.cv.bind('<Button2-ButtonRelease>', self.release3)
         self.cv.bind('<MouseWheel>', self.wheel)
+        self.cv.bind('<Button-4>', self.wheelLinuxUp)
+        self.cv.bind('<Button-5>', self.wheelLinuxDown)
         self.keyNum = keynum
         self.cv.bind('<KeyPress>', self.keyPress)
         self.cv.bind('<KeyRelease>', self.keyRelease)
@@ -121,6 +123,10 @@ class turtleTools():
         return self.clicked3
     def wheel(self, event):
         self.scroll += event.delta / 120
+    def wheelLinuxUp(self, event):
+        self.scroll += 1
+    def wheelLinuxDown(self, event):
+        self.scroll += -1
     def mouseWheel(self):
         temp = self.scroll
         self.scroll = 0
