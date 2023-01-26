@@ -615,9 +615,9 @@ class master:
             self.refillKey('8')
         else:
             if self.keys.count('8') > 0:
-                self.removeKey('7')
+                self.removeKey('8')
         if turtools.keyPressed('9'):
-            if self.keys.count('8') < 1:
+            if self.keys.count('9') < 1:
                 if self.wireHold == 1:
                     self.wireHold = 0
                 else:
