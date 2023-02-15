@@ -3,14 +3,13 @@ class turtleTools():
     This is a helper module for turtle projects
     Requires turtle to be imported as t
     Requires a canvas (t.setup()), and coordinate minimums and maximums as initial arguments
-    Anytime the coordinates change or the screen resolution changes, you must reinitialize the module
     If the mouse coordinates are off, you can use turtletools.realign() to put them back in place (this is a last resort)
-    Key presses use tkinter event.char in lookup (a space is ' ', a shift is ', tab is \t')
+    Key presses use tkinter event.char in lookup (a space is ' ', a shift is '', tab is '\t')
     Display turtleTools.keys while pressing a key to display the associated event.char
     If you would like more control, initialize turtools with an extra 'True' at the end of the initial arguments to activate KEYNUM mode
-
+    
     Commands:
-    getMouseCoords() - returns the coordinates of the mouse in two separate floats x then y
+    getMouseCoords() - returns the coordinates of the mouse in two separate floats x then y, you can throw a False in to extend the coordinates when you resize instead of scaling
     mouseDown() - returns a boolean True if the LMB is being clicked and False otherwise
     mouseDownRight() - returns a boolean True of the RMB is being clicked and False otherwise
     mouseDownMid() - returns a boolean True if the Middle mouse button is being clicked and False otherwise
@@ -35,8 +34,10 @@ class turtleTools():
         self.screenheight = self.cv.winfo_screenheight()
         self.initwidth = self.cv.winfo_width()
         self.initheight = self.cv.winfo_height()
-        self.width = self.cv.winfo_width()
-        self.height = self.cv.winfo_height()
+        self.originwidth = self.cv.winfo_width()
+        self.originheight = self.cv.winfo_height()
+        self.width = self.originwidth
+        self.height = self.originheight
         self.xmin = xmin
         self.ymin = ymin
         self.xmax = xmax
@@ -45,8 +46,11 @@ class turtleTools():
         self.margintop = -13
         self.marginright = -7
         self.marginbottom = -7
+        self.w, self.h = self.width + self.marginleft + self.marginright, self.height + self.margintop + self.marginbottom
+        self.scalex = (self.xmax - self.xmin) / self.w
+        self.scaley = (self.ymin - self.ymax) / self.h
         self.wasmaxed = 0
-        self.resized = 0
+        self.resized = 2
         self.clicked = False
         self.clicked2 = False
         self.clicked3 = False
@@ -64,7 +68,7 @@ class turtleTools():
         self.cv.bind('<KeyPress>', self.keyPress)
         self.cv.bind('<KeyRelease>', self.keyRelease)
         t.listen()
-    def getMouseCoords(self):
+    def getMouseCoords(self, scaleOrExtend=True):
         self.width = self.cv.winfo_width()
         self.height = self.cv.winfo_height()
         if self.height == self.screenheight - 72:
@@ -87,14 +91,18 @@ class turtleTools():
             self.offsetX = -13
             self.offsetY = -13.5
         else:
-            self.offsetX = -4
-            self.offsetY = -4
+            self.offsetX = -13
+            self.offsetY = -13
         x, y = self.cv.winfo_pointerx() - self.cv.winfo_rootx(), self.cv.winfo_pointery() - self.cv.winfo_rooty()
-        self.w, self.h = self.width + self.marginleft + self.marginright, self.height + self.margintop + self.marginbottom
-        self.scalex = (self.xmax - self.xmin) / self.w
-        self.scaley = (self.ymin - self.ymax) / self.h
-        self.x = (x + self.offsetX) * self.scalex + self.xmin
-        self.y = (y + self.offsetY) * self.scaley + self.ymax
+        if scaleOrExtend:
+            self.w, self.h = self.width + self.marginleft + self.marginright, self.height + self.margintop + self.marginbottom
+            self.scalex = (self.xmax - self.xmin) / self.w
+            self.scaley = (self.ymin - self.ymax) / self.h
+            self.x = (x + self.offsetX) * self.scalex + self.xmin
+            self.y = (y + self.offsetY) * self.scaley + self.ymax
+        else:
+            self.x = (x + self.offsetX - (self.width - self.originwidth) * 0.5) * self.scalex + self.xmin
+            self.y = (y + self.offsetY - (self.height - self.originheight) * 0.5) * self.scaley + self.ymax
         return self.x, self.y
     def realign(self):
         self.width = self.cv.winfo_width()
