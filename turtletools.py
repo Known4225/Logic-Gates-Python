@@ -4,8 +4,8 @@ class turtleTools():
     Requires turtle to be imported as t
     Requires a canvas (t.setup()), and coordinate minimums and maximums as initial arguments
     If the mouse coordinates are off, you can use turtletools.realign() to put them back in place (this is a last resort)
-    Key presses use tkinter event.char in lookup (a space is ' ', a shift is '', tab is '\t')
-    Display turtleTools.keys while pressing a key to display the associated event.char
+    Key presses use tkinter event.keysym in lookup (a space is 'space', a shift is 'Shift_L', tab is '\t')
+    Display turtleTools.keys while pressing a key to display the associated event.keysym
     If you would like more control, initialize turtools with an extra 'True' at the end of the initial arguments to activate KEYNUM mode
     
     Commands:
@@ -14,7 +14,7 @@ class turtleTools():
     mouseDownRight() - returns a boolean True of the RMB is being clicked and False otherwise
     mouseDownMid() - returns a boolean True if the Middle mouse button is being clicked and False otherwise
     mouseWheel() - returns a number of how much the mouse has scrolled between this check and the last
-    keyPressed(key) - returns a boolean True if the key (character) input is being held down and False otherwise. This uses tkinter event.char in lookup
+    keyPressed(key) - returns a boolean True if the key (character) input is being held down and False otherwise. This uses tkinter event.keysym in lookup
     realign() - this method attempts to realign the mouse coordinates with the window coordinates. It does this by resizing the window.
     '''
     def __init__(self, cv, xmin, ymin, xmax, ymax, keynum=False):
@@ -144,13 +144,15 @@ class turtleTools():
             return True
         return False
     def keyPress(self, event):
-        if event.char not in self.keys:
-            self.keys.append(event.char)
+        if event.keysym not in self.keys:
+            # self.keys.append(event.char) depreciated
+            self.keys.append(event.keysym)
             if self.keyNum:
                 self.keys.append(event.keycode)
     def keyRelease(self, event):
         try:
-            self.keys.remove(event.char)
+            # self.keys.remove(event.char) depreciated
+            self.keys.remove(event.keysym)
             if self.keyNum:
                 self.keys.remove(event.keycode)
         except:
