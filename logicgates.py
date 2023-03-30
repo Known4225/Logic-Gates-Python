@@ -2,28 +2,18 @@ import turtle as t
 from turtletools import turtleTools
 import math as m
 '''
-Windows:
-Shift key - turtools.keyPressed(16) (this is 7 on linux)
-Space key - turtools.keyPressed(32) (this is o on linux)
-Up arrow - turtools.keyPressed(38) (this is a on linux (problem))
-Left arrow - turtools.keyPressed(37) (this is ctrl on linux)
-Right arrow - turtools.keyPressed(39) (this is s on linux (problem))
-Down arrow - turtools.keyPressed(40) (this is d on linux)
-
-Linux:
-Shift key - turtools.keyPressed(50) (this is ___ on windows)
-Space key - turtools.keyPressed(65) (this is ___ on windows)
-Up arrow - turtools.keyPressed(111) (this is ___ on windows)
-Left arrow - turtools.keyPressed(113) (this is ___ on windows)
-Right arrow - turtools.keyPressed(114) (this is ___ on windows)
-Down arrow - turtools.keyPressed(116) (this is ___ on windows)
+Shift key - turtools.keyPressed(16)
+Space key - turtools.keyPressed(32)
+Up arrow - turtools.keyPressed(38)
+Left arrow - turtools.keyPressed(37)
+Right arrow - turtools.keyPressed(39)
+Down arrow - turtools.keyPressed(40)
 '''
 global globalsize, turtools, themeColors
 globalsize = 1.5
 t.setup(960, 720)
 t.colormode(255)
-t.title("Logic Gates")
-tps = 'inf' #set this to a different number to change the ticks per second, this changes things like how fast the scroll and rotate features work
+tps = 240
 turtools = turtleTools(t.getcanvas(), -240, -180, 240, 180, True)
 themeColors = ['null', 0, 0, 0, 195, 195, 195, 255, 0, 0, 255, 146, 146, 230, 230, 230, 95, 95, 95, 255, 234, 0, 255, 248, 181, 255, 255, 255,
 100, 100, 100, 195, 195, 195, 74, 198, 174, 155 ,199, 190, 50, 50, 50, 200, 200, 200, 136, 203, 213, 145, 207, 214, 30, 30, 30]
@@ -37,9 +27,6 @@ class master:
         self.sp.penup()
         self.sp.pencolor(themeColors[1 + self.theme], themeColors[2 + self.theme], themeColors[3 + self.theme])
         self.sp.shape('circle')
-        self.scrollSpeed = 1 #this also changes the scroll speed
-        self.rotateSpeed = 1 #this also changes the rotate speed
-        self.rotateCooldown = 1
         self.mx = 0
         self.my = 0
         self.scaling = 2
@@ -84,7 +71,6 @@ class master:
         self.inpComp = ['null']
         self.io = ['null']
         self.keys = ['null']
-        self.bufferFrames = 1
         self.positions = ['null']
         self.selected = ['null']
         self.selectOb = ['null']
@@ -102,11 +88,6 @@ class master:
             self.scaling = hp
         self.mx, self.my = turtools.getMouseCoords()
         self.mw = turtools.mouseWheel()
-        self.linuxMouse = 0
-        if self.keys.count("up"):
-            self.linuxMouse += 1
-        if self.keys.count("down"):
-            self.linuxMouse -= 1
         self.sp.clear()
         self.renderComp()
         self.renderWire(globalsize)
@@ -129,59 +110,61 @@ class master:
             self.NAND(self.mx, self.my, globalsize, self.holdingAng)
         if self.holding == "BUFFER":
             self.BUFFER(self.mx, self.my, globalsize, self.holdingAng)
-        if ((turtools.keyPressed(39) or turtools.keyPressed(114)) and not turtools.keyPressed('s')):
+        if turtools.keyPressed(39):
             if not self.holding == 0 and not self.holding == 1:
-                self.holdingAng += 0.5 * self.rotateSpeed
+                self.holdingAng += 5
             else:
                 if self.selecting > 1:
-                    if self.keys.count("space") > 0:
-                        self.rotateSelected(-0.5 * self.rotateSpeed)
+                    if turtools.keyPressed(32):
+                        self.rotateSelected(-5)
                     else:
                         i = 1
                         for j in range(len(self.selected) - 1):
-                            self.positions[self.selected[i] * 3] += 0.5 * self.rotateSpeed
+                            self.positions[self.selected[i] * 3] += 5
                             if self.positions[self.selected[i] * 3] > 360:
                                 self.positions[self.selected[i] * 3] -=360
                             i += 1
                 else:
                     if not self.hlgcomp == 0:
-                        self.positions[self.hlgcomp * 3] += 0.5 * self.rotateSpeed
+                        self.positions[self.hlgcomp * 3] += 5
                         if self.positions[self.hlgcomp * 3] > 360:
                             self.positions[self.hlgcomp * 3] -= 360
-        if (turtools.keyPressed(37) or turtools.keyPressed(113)):
+        if turtools.keyPressed(37):
             if not self.holding == 0 and not self.holding == 1:
-                self.holdingAng -= 0.5 * self.rotateSpeed
+                self.holdingAng -= 5
             else:
                 if self.selecting > 1:
                     # space key
-                    if self.keys.count("space") > 0:
-                        self.rotateSelected(0.5 * self.rotateSpeed)
+                    if turtools.keyPressed(32):
+                        self.rotateSelected(5)
                     else:
                         i = 1
                         for j in range(len(self.selected) - 1):
-                            self.positions[self.selected[i] * 3] -=  0.5 * self.rotateSpeed
+                            self.positions[self.selected[i] * 3] -=  5
                             if self.positions[self.selected[i] * 3] < 0:
                                 self.positions[self.selected[i] * 3] += 360
                             i += 1
                 else:
                     if not self.hlgcomp == 0:
-                        self.positions[self.hlgcomp * 3] -= 0.5 * self.rotateSpeed
+                        self.positions[self.hlgcomp * 3] -= 5
                         if self.positions[self.hlgcomp * 3] < 0:
                             self.positions[self.hlgcomp * 3] += 360
         self.mouseTick()
     def mouseTick(self):
+        # print(turtools.mouseWheel())
         if turtools.mouseDown():
+            # print(self.selectOb)
             if not self.keys.count("mouse") > 0:
-                self.keys.append("mouse")
-                self.keys.append(0) #buffer frames (0 on mouse since this problem does not exist on mouse events)
+                # print(self.io)
+                self.keys.append("mouse") 
                 if self.mx > self.boundXmin and self.mx < self.boundXmax and self.my > self.boundYmin and self.my < self.boundYmax:
                     self.mouseType = 0
-                    if not self.selecting == 2 and not self.selected.count(self.hlgcomp) > 0 and not ((self.keys.count("space") > 0 or self.wireHold == 1) and not self.hlgcomp == 0):
+                    if not self.selecting == 2 and not self.selected.count(self.hlgcomp) > 0 and not ((turtools.keyPressed(32) or self.wireHold == 1) and not self.hlgcomp == 0):
                         self.wireHold = 0
                         self.selecting = 0
                         self.selectOb = ['null']
                         self.selected = ['null']
-                    if self.keys.count('s') > 0 or (turtools.keyPressed(16) or turtools.keyPressed(50)):
+                    if turtools.keyPressed('s') or turtools.keyPressed(16):
                         if self.holding == 0 or self.holding == 1:
                             self.selecting = 1
                             self.selectOb = ['null']
@@ -202,7 +185,7 @@ class master:
                     else:
                         if self.holding == 0 or self.holding == 1:
                             if not self.hlgcomp == 0:
-                                if self.keys.count("space") > 0 or self.wireHold == 1:
+                                if turtools.keyPressed(32) or self.wireHold == 1:
                                     self.wiringStart = self.hlgcomp
                                 else:
                                     self.hglmove = self.hlgcomp
@@ -219,7 +202,7 @@ class master:
                                             self.selected.append(self.selectOb[i])
                                             i += 1
                                 else:
-                                    if not self.selecting == 3 and not (self.keys.count("space") > 0 or self.wireHold == 1 and not self.hlgcomp == 0):
+                                    if not self.selecting == 3 and not (turtools.keyPressed(32) or self.wireHold == 1 and not self.hlgcomp == 0):
                                         self.wireHold = 0
                                         self.selecting = 0
                                         self.selectOb = ['null']
@@ -242,7 +225,7 @@ class master:
                         self.FocalY = self.my
                         self.FocalCSX = self.CSX
                         self.FocalCSY = self.CSY
-                        if not self.selecting == 3 and not (self.keys.count("space") > 0 or self.wireHold == 1 and not self.hlgcomp == 0):
+                        if not self.selecting == 3 and not (turtools.keyPressed(32) or self.wireHold == 1 and not self.hlgcomp == 0):
                             self.wireHold = 0
                             self.selecting = 0
                             self.selectOb = ['null']
@@ -272,7 +255,7 @@ class master:
                             self.holding = self.compSlots[round((self.mx + 245) / 48) * 2 - 1]
             if self.mouseType == 1 and self.mx > self.boundXmin and self.mx < self.boundXmax and self.my > self.boundYmin and self.my < self.boundYmax:
                 self.mouseType = 2
-            if (self.keys.count('s') > 0 or (turtools.keyPressed(16) or turtools.keyPressed(50))) and self.selecting == 1:
+            if (turtools.keyPressed('s') or turtools.keyPressed(16)) and self.selecting == 1:
                 self.selectX2 = self.mx
                 self.selectY2 = self.my
                 self.selectionBox(self.selectX, self.selectY, self.selectX2, self.selectY2)
@@ -298,7 +281,7 @@ class master:
                     self.symax = 0
                     self.sxmin = 0
                     self.symin = 0
-                if (self.keys.count("space") > 0 or self.wireHold == 1) and not self.wiringStart == 0:
+                if (turtools.keyPressed(32) or self.wireHold == 1) and not self.wiringStart == 0:
                     if self.selected.count(self.wiringStart) > 0 or self.selected.count(self.hlgcomp) > 0:
                         self.sp.pencolor(themeColors[4 + self.theme], themeColors[5 + self.theme], themeColors[6 + self.theme])
                     else:
@@ -333,7 +316,7 @@ class master:
                                 self.sp.goto(self.mx, self.my)
                             self.sp.penup()
                 if self.hglmove == 0:
-                    if self.keys.count("space") > 0 or self.wireHold == 1:
+                    if turtools.keyPressed(32) or self.wireHold == 1:
                         self.FocalX = self.mx
                         self.FocalY = self.my
                         self.FocalCSX = self.CSX
@@ -401,7 +384,7 @@ class master:
                     self.selectY2 = self.selectY
                     self.selectY = self.my
             else:
-                if (self.keys.count("space") > 0 or self.wireHold == 1) and not self.wiringStart == 0 and not self.wiringEnd == 0 and not self.wiringStart == self.wiringEnd:
+                if (turtools.keyPressed(32) or self.wireHold == 1) and not self.wiringStart == 0 and not self.wiringEnd == 0 and not self.wiringStart == self.wiringEnd:
                     wireSQueue = ['null']
                     wireEQueue = ['null']
                     if self.selected.count(self.wiringStart) > 0 and self.selecting > 1:
@@ -467,50 +450,31 @@ class master:
                             j += 1
                         k += 1
                 if len(self.positions) > self.hglmove * 3 and self.components[self.hglmove] == "POWER" and self.positions[self.hglmove * 3 - 2] == self.tempX and self.positions[self.hglmove * 3 - 1] == self.tempY:
-                    if self.io[self.hglmove * 3] == 0:
-                        self.io[self.hglmove * 3] = 1
+                    if self.io[self.hglmove * 3 - 1] == 0:
+                        self.io[self.hglmove * 3 - 1] = 1
                     else:
-                        self.io[self.hglmove * 3] = 0
+                        self.io[self.hglmove * 3 - 1] = 0
                 self.hglmove = 0
                 self.wiringStart = 0
                 self.wiringEnd = 0
                 if self.keys.count("mouse") > 0:
                     # updateUNDO
-                    self.removeKey("mouse")
+                    self.keys.remove("mouse")
         self.hotkeyTick()
     def hotkeyTick(self):
-        if (turtools.keyPressed(32) or turtools.keyPressed(65)):
-            self.refillKey("space")
-        else:
-            if self.keys.count("space") > 0:
-                self.removeKey("space")
-        if turtools.keyPressed('s'):
-            self.refillKey('s')
-        else:
-            if self.keys.count('s') > 0:
-                self.removeKey('s')
-        if (turtools.keyPressed(38) or turtools.keyPressed(111)):
-            self.refillKey("up")
-        else:
-            if self.keys.count("up") > 0:
-                self.removeKey("up")
-        if (turtools.keyPressed(40) or turtools.keyPressed(116)):
-            self.refillKey("down")
-        else:
-            if self.keys.count("down") > 0:
-                self.removeKey("down")
         if turtools.keyPressed('p') or turtools.keyPressed('e') or turtools.keyPressed('1'):
-            if self.keys.count('p') < 1:
+            if not self.keys.count('p') > 0:
+                self.keys.append('p')
                 if self.holding == "POWER":
                     self.holding = 0
                 else:
                     self.holding = "POWER"
-            self.refillKey('p')
         else:
             if self.keys.count('p') > 0:
-                self.removeKey('p')
+                self.keys.remove('p')
         if turtools.keyPressed('x'):
-            if self.keys.count('d') < 1:
+            if not self.keys.count('d') > 0:
+                self.keys.append('d')
                 if self.selecting > 1 and len(self.selected) > 1 and (self.holding == 0 or self.holding == 1):
                     for i in range(len(self.selected) - 1):
                         self.deleteComp(self.selected[1])
@@ -520,203 +484,174 @@ class master:
                 else:
                     if not self.hlgcomp == 0:
                         self.deleteComp(self.hlgcomp)
-            self.refillKey('d')
         else:
             if self.keys.count('d') > 0:
-                self.removeKey('d')
+                self.keys.remove('d')
         if turtools.keyPressed('a') or turtools.keyPressed('3'):
-            if self.keys.count('a') < 1:
+            if not self.keys.count('a') > 0:
+                self.keys.append('a')
                 if self.holding == "AND":
                     self.holding = 0
                 else:
                     self.holding = "AND"
-            self.refillKey('a')
         else:
             if self.keys.count('a') > 0:
-                self.removeKey('a')
+                self.keys.remove('a')
         if turtools.keyPressed('o') or turtools.keyPressed('q') or turtools.keyPressed('4'):
-            if self.keys.count('o') < 1:
+            if not self.keys.count('o') > 0:
+                self.keys.append('o')
                 if self.holding == "OR":
                     self.holding = 0
                 else:
                     self.holding = "OR"
-            self.refillKey('o')
         else:
             if self.keys.count('o') > 0:
-                self.removeKey('o')
+                self.keys.remove('o')
         if turtools.keyPressed('n') or turtools.keyPressed('w') or turtools.keyPressed('2'):
-            if self.keys.count('n') < 1:
+            if not self.keys.count('n') > 0:
+                self.keys.append('n')
                 if self.holding == "NOT":
                     self.holding = 0
                 else:
                     self.holding = "NOT"
-            self.refillKey('n')
         else:
             if self.keys.count('n') > 0:
-                self.removeKey('n')
+                self.keys.remove('n')
         # old code for toggling power blocks with the t key
-        # if turtools.keyPressed('t')
-        #     if self.keys.count('t') < 1:
+        # if turtools.keyPressed('t'):
+        #     if not self.keys.count('t') > 0:
+        #         self.keys.append('t')
         #         if self.components[self.hlgcomp] == "POWER":
         #             if self.io[self.hlgcomp * 3] == 0:
         #                 self.io[self.hlgcomp * 3] = 1
         #             else:
         #                 self.io[self.hlgcomp * 3] = 0
-        #     self.refillKey('t')
         # else:
         #     if self.keys.count('t') > 0:
-        #         self.removeKey('t')
+        #         self.keys.remove('t')
         if turtools.keyPressed('t'):
-            if self.keys.count('t') < 1:
+            if not self.keys.count('t') > 0:
+                self.keys.append('t')
                 if self.theme == 0:
                     self.theme = 27
                 else:
                     self.theme = 0
                 t.Screen().bgcolor(themeColors[25 + self.theme], themeColors[26 + self.theme], themeColors[27 + self.theme])
-            self.refillKey('t')
         else:
             if self.keys.count('t') > 0:
-                self.removeKey('t')
+                self.keys.remove('t')
         if turtools.keyPressed('5'):
-            if self.keys.count('5') < 1:
+            if not self.keys.count('5') > 0:
+                self.keys.append('5')
                 if self.holding == "XOR":
                     self.holding = 0
                 else:
                     self.holding = "XOR"
-            self.refillKey('5')
         else:
             if self.keys.count('5') > 0:
-                self.removeKey('5')
+                self.keys.remove('5')
         if turtools.keyPressed('6'):
-            if self.keys.count('6') < 1:
+            if not self.keys.count('6') > 0:
+                self.keys.append('6')
                 if self.holding == "NOR":
                     self.holding = 0
                 else:
                     self.holding = "NOR"
-            self.refillKey('6')
         else:
             if self.keys.count('6') > 0:
-                self.removeKey('6')
+                self.keys.remove('6')
         if turtools.keyPressed('7'):
-            if self.keys.count('7') < 1:
+            if not self.keys.count('7') > 0:
+                self.keys.append('7')
                 if self.holding == "NAND":
                     self.holding = 0
                 else:
                     self.holding = "NAND"
-            self.refillKey('7')
         else:
             if self.keys.count('7') > 0:
-                self.removeKey('7')
+                self.keys.remove('7')
         if turtools.keyPressed('8'):
-            if self.keys.count('8') < 1:
+            if not self.keys.count('8') > 0:
+                self.keys.append('8')
                 if self.holding == "BUFFER":
                     self.holding = 0
                 else:
                     self.holding = "BUFFER"
-            self.refillKey('8')
         else:
             if self.keys.count('8') > 0:
-                self.removeKey('8')
+                self.keys.remove('8')
         if turtools.keyPressed('9'):
-            if self.keys.count('9') < 1:
+            if not self.keys.count('9') > 0:
+                self.keys.append('9')
                 if self.wireHold == 1:
                     self.wireHold = 0
                 else:
                     self.wireHold = 1
                     self.holding = 0
-            self.refillKey('9')
         else:
             if self.keys.count('9') > 0:
-                self.removeKey('9')
+                self.keys.remove('9')
         if not self.holding == 0 and not self.holding == 1:
             self.wireHold = 0
         if turtools.keyPressed('c'):
-            if self.keys.count('c') < 1:
+            if not self.keys.count('c') > 0:
+                self.keys.append('c')
                 if self.selecting > 1 and len(self.selected) > 1 and (self.holding == 0 or self.holding == 1):
                     self.copySelected()
-            self.refillKey('c')
         else:
             if self.keys.count('c') > 0:
-                self.removeKey('c')
+                self.keys.remove('c')
         if turtools.keyPressed('h'):
-            if self.keys.count('h') < 1:
+            if not self.keys.count('h') > 0:
+                self.keys.append('h')
                 self.sidebar += 1
                 if self.sidebar > 2:
                     self.sidebar = 0
-            self.refillKey('h')
         else:
             if self.keys.count('h') > 0:
-                self.removeKey('h')
+                self.keys.remove('h')
         self.scrollTick()
     def scrollTick(self):
         global globalsize
         # since the mouseWheel() command resets the value to 0, a variable must be used to store the value to make use of it later (since you can't just run the command again since it will be set to 0)
-        # print(self.mw)
-        if self.mw > 0 or self.linuxMouse > 0:
-            if self.keys.count("space") > 0:
-                if self.rotateCooldown == 1:
-                    if self.selecting > 1:
-                        self.rotateSelected(90)
+        # print(mw)
+        if self.mw > 0:
+            if turtools.keyPressed(32):
+                if self.selecting > 1:
+                    self.rotateSelected(90)
+                else:
+                    if not self.holding == 0 and not self.holding == 1:
+                        self.holdingAng -= 90
                     else:
-                        if not self.holding == 0 and not self.holding == 1:
-                            self.holdingAng -= 90
-                        else:
-                            if not self.hlgcomp == 0:
-                                self.positions[self.hlgcomp * 3] -= 90
-                                if self.positions[self.hlgcomp * 3] < 0:
-                                    self.positions[self.hlgcomp * 3] += 360
-                    self.rotateCooldown = 0
+                        if not self.hlgcomp == 0:
+                            self.positions[self.hlgcomp * 3] -= 90
+                            if self.positions[self.hlgcomp * 3] < 0:
+                                self.positions[self.hlgcomp * 3] += 360
             else:
                 if self.Cscl > 0.15:
-                    self.CSX += self.mx * 0.1 * self.scrollSpeed
-                    self.CSY += self.my * 0.1 * self.scrollSpeed
-                    self.Cscl -= 0.1 * self.scrollSpeed
+                    self.CSX += self.mx * 0.1
+                    self.CSY += self.my * 0.1
+                    self.Cscl -= 0.1
                     globalsize = 1.5 / self.Cscl
-        if self.mw < 0 or self.linuxMouse < 0:
-            if self.keys.count("space") > 0:
-                if self.rotateCooldown == 1:
-                    if self.selecting > 1:
-                        self.rotateSelected(-90)
-                    else:
-                        if not self.holding == 0 and not self.holding == 1:
-                            self.holdingAng += 90
-                        else:
-                            if not self.hlgcomp == 0:
-                                self.positions[self.hlgcomp * 3] += 90
-                                if self.positions[self.hlgcomp * 3] > 360:
-                                    self.positions[self.hlgcomp * 3] -= 360
-                    self.rotateCooldown = 0
-            else:
-                self.CSX -= self.mx * 0.1 * self.scrollSpeed
-                self.CSY -= self.my * 0.1 * self.scrollSpeed
-                self.Cscl += 0.1 * self.scrollSpeed
-                globalsize = 1.5 / self.Cscl
-        if self.mw == 0 and self.linuxMouse == 0:
-            self.rotateCooldown = 1
-        # if len(turtools.keys) == 0 and not turtools.mouseDown():
-        #     self.keys = ['null']
-    def refillKey(self, key):
-        i = 1
-        for j in range(int(round((len(self.keys) - 1) / 2))):
-            if self.keys[i] == key:
-                self.keys[i + 1] = self.bufferFrames
-                return
-            i += 2
-        self.keys.append(key)
-        self.keys.append(self.bufferFrames)
-        return
-    def removeKey(self, key):
-        i = 1
-        for j in range(int(round((len(self.keys) - 1) / 2))):
-            if self.keys[i] == key:
-                if self.keys[i + 1] <= 0:
-                    self.keys.pop(i)
-                    self.keys.pop(i)
+        if self.mw < 0:
+            if turtools.keyPressed(32):
+                if self.selecting > 1:
+                    self.rotateSelected(-90)
                 else:
-                    self.keys[i + 1] -= 1
-                return
-            i += 2
-        return
+                    if not self.holding == 0 and not self.holding == 1:
+                        self.holdingAng += 90
+                    else:
+                        if not self.hlgcomp == 0:
+                            self.positions[self.hlgcomp * 3] += 90
+                            if self.positions[self.hlgcomp * 3] > 360:
+                                self.positions[self.hlgcomp * 3] -= 360
+            else:
+                self.CSX -= self.mx * 0.1
+                self.CSY -= self.my * 0.1
+                self.Cscl += 0.1
+                globalsize = 1.5 / self.Cscl
+        if len(turtools.keys) == 0 and not turtools.mouseDown():
+            self.keys = []
     def copySelected(self):
         self.sxmax = 0
         self.sxmin = 0
@@ -745,11 +680,15 @@ class master:
             self.inpComp.append(self.inpComp[self.selected[i] * 3 - 2])
             if self.selected.count(self.inpComp[self.selected[i] * 3 - 1]) > 0:
                 self.inpComp.append(l + self.inpComp[self.selected[i] * 3 - 1])
+                if self.selected.count(self.inpComp[self.selected[i] * 3]) > 0:
+                    self.inpComp.append(l + self.inpComp[self.selected[i] * 3])
+                else:
+                    self.inpComp.append(0)
             else:
-                self.inpComp.append(0)
-            if self.selected.count(self.inpComp[self.selected[i] * 3]) > 0:
-                self.inpComp.append(l + self.inpComp[self.selected[i] * 3])
-            else:
+                if self.selected.count(self.inpComp[self.selected[i] * 3]) > 0:
+                    self.inpComp.append(l + self.inpComp[self.selected[i] * 3])
+                else:
+                    self.inpComp.append(0)
                 self.inpComp.append(0)
             i += 1
         i = 1
@@ -823,7 +762,7 @@ class master:
                         self.io[i] = 0
                     else:
                         self.inpComp[i] = 0
-                        self.inpComp[i + 1] = 0
+                        self.io[i - 1] = 0
                 else:
                     if self.inpComp[i] > index:
                         self.inpComp[i] -= 1
@@ -831,9 +770,9 @@ class master:
                     self.io[i] = 0
             else:
                 if self.inpComp[i] > index:
-                        self.inpComp[i] -= 1
+                    self.inpComp[i] -= 1
                 if self.inpComp[i + 1] > index:
-                        self.inpComp[i + 1] -= 1
+                    self.inpComp[i + 1] -= 1
             i += 3
         self.components.pop(index)
         for i in range(3):
@@ -871,21 +810,23 @@ class master:
                 self.positions[self.selected[i] * 3] -= 360
             i += 1
     def wireIO(self, index1, index2):
+        if self.components[self.wiring[index1]] == "POWER":
+            self.io[self.wiring[index1] * 3] = (self.io[self.wiring[index1] * 3 - 2] or self.io[self.wiring[index1] * 3 - 1]) + 0
         if self.components[self.wiring[index1]] == "BUFFER":
             self.io[self.wiring[index1] * 3] = self.io[self.wiring[index1] * 3 - 1]
             self.io[self.wiring[index1] * 3 - 1] = self.io[self.wiring[index1] * 3 - 2]
         if self.components[self.wiring[index1]] == "NOT":
-            self.io[self.wiring[index1] * 3] = abs(self.io[self.wiring[index1] * 3 - 2] - 1)
+            self.io[self.wiring[index1] * 3] = (not self.io[self.wiring[index1] * 3 - 2]) + 0
         if self.components[self.wiring[index1]] == "AND":
-            self.io[self.wiring[index1] * 3] = self.io[self.wiring[index1] * 3 - 2] * self.io[self.wiring[index1] * 3 - 1]
+            self.io[self.wiring[index1] * 3] = (self.io[self.wiring[index1] * 3 - 2] and self.io[self.wiring[index1] * 3 - 1]) + 0
         if self.components[self.wiring[index1]] == "OR":
-            self.io[self.wiring[index1] * 3] = m.ceil((self.io[self.wiring[index1] * 3 - 2] + self.io[self.wiring[index1] * 3 - 1]) / 2)
+            self.io[self.wiring[index1] * 3] = (self.io[self.wiring[index1] * 3 - 2] or self.io[self.wiring[index1] * 3 - 1]) + 0
         if self.components[self.wiring[index1]] == "XOR":
             self.io[self.wiring[index1] * 3] = abs(self.io[self.wiring[index1] * 3 - 2] - self.io[self.wiring[index1] * 3 - 1])
         if self.components[self.wiring[index1]] == "NOR":
-            self.io[self.wiring[index1] * 3] = abs(m.ceil((self.io[self.wiring[index1] * 3 - 2] - self.io[self.wiring[index1] * 3 - 1]) / 2) - 1)
+            self.io[self.wiring[index1] * 3] = (not (self.io[self.wiring[index1] * 3 - 2] or self.io[self.wiring[index1] * 3 - 1])) + 0
         if self.components[self.wiring[index1]] == "NAND":
-            self.io[self.wiring[index1] * 3] = abs(self.io[self.wiring[index1] * 3 - 2] * self.io[self.wiring[index1] * 3 - 1] - 1)
+            self.io[self.wiring[index1] * 3] = (not (self.io[self.wiring[index1] * 3 - 2] and self.io[self.wiring[index1] * 3 - 1])) + 0
         self.wiring[index1 + 2] = self.io[self.wiring[index1] * 3]
         if self.inpComp[self.wiring[index2] * 3 - 1] == self.wiring[index1]:
             self.io[self.wiring[index1 + 1] * 3 - 2] = self.io[self.wiring[index1] * 3]
@@ -937,7 +878,7 @@ class master:
                 else:
                     self.sp.pencolor(themeColors[1 + self.theme], themeColors[2 + self.theme], themeColors[3 + self.theme])
                 if self.components[i] == "POWER":
-                    if self.io[i * 3] == 1:
+                    if self.io[i * 3 - 1] == 1:
                         if self.selectOb.count(i) > 0:
                             self.POWER(renderX, renderY, globalsize, self.positions[i * 3], 1, 1)
                         else:
@@ -1061,7 +1002,7 @@ class master:
                 self.sp.pencolor(themeColors[1 + self.theme], themeColors[2 + self.theme], themeColors[3 + self.theme])
             self.BUFFER(j, i, 1.5, 90)
             j += 45
-            if (self.keys.count("space") > 0 or self.wireHold) and self.indicators == 1:
+            if (turtools.keyPressed(32) or self.wireHold) and self.indicators == 1:
                 self.sp.pencolor(themeColors[16 + self.theme], themeColors[17 + self.theme], themeColors[18 + self.theme])
             else:
                 self.sp.pencolor(themeColors[1 + self.theme], themeColors[2 + self.theme], themeColors[3 + self.theme])
@@ -1293,9 +1234,6 @@ class master:
         self.sp.goto(x + 12 * size, y + 9 * size)
         self.sp.penup()
 main = master()
-if tps == 'inf' or tps == 'infinity':
-    while True:
-        main.tick()
-else:
-    while True:
-        t.ontimer(main.tick(), int(1000/tps))
+while True:
+    main.tick()
+    # t.ontimer(main.tick(), int(1000/tps))
