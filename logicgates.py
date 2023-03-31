@@ -467,10 +467,10 @@ class master:
                             j += 1
                         k += 1
                 if len(self.positions) > self.hglmove * 3 and self.components[self.hglmove] == "POWER" and self.positions[self.hglmove * 3 - 2] == self.tempX and self.positions[self.hglmove * 3 - 1] == self.tempY:
-                    if self.io[self.hglmove * 3] == 0:
-                        self.io[self.hglmove * 3] = 1
+                    if self.io[self.hglmove * 3 - 1] == 0:
+                        self.io[self.hglmove * 3 - 1] = 1
                     else:
-                        self.io[self.hglmove * 3] = 0
+                        self.io[self.hglmove * 3 - 1] = 0
                 self.hglmove = 0
                 self.wiringStart = 0
                 self.wiringEnd = 0
@@ -745,11 +745,15 @@ class master:
             self.inpComp.append(self.inpComp[self.selected[i] * 3 - 2])
             if self.selected.count(self.inpComp[self.selected[i] * 3 - 1]) > 0:
                 self.inpComp.append(l + self.inpComp[self.selected[i] * 3 - 1])
+                if self.selected.count(self.inpComp[self.selected[i] * 3]) > 0:
+                    self.inpComp.append(l + self.inpComp[self.selected[i] * 3])
+                else:
+                    self.inpComp.append(0)
             else:
-                self.inpComp.append(0)
-            if self.selected.count(self.inpComp[self.selected[i] * 3]) > 0:
-                self.inpComp.append(l + self.inpComp[self.selected[i] * 3])
-            else:
+                if self.selected.count(self.inpComp[self.selected[i] * 3]) > 0:
+                    self.inpComp.append(l + self.inpComp[self.selected[i] * 3])
+                else:
+                    self.inpComp.append(0)
                 self.inpComp.append(0)
             i += 1
         i = 1
@@ -871,21 +875,23 @@ class master:
                 self.positions[self.selected[i] * 3] -= 360
             i += 1
     def wireIO(self, index1, index2):
+        if self.components[self.wiring[index1]] == "POWER":
+            self.io[self.wiring[index1] * 3] = (self.io[self.wiring[index1] * 3 - 2] or self.io[self.wiring[index1] * 3 - 1]) + 0
         if self.components[self.wiring[index1]] == "BUFFER":
             self.io[self.wiring[index1] * 3] = self.io[self.wiring[index1] * 3 - 1]
             self.io[self.wiring[index1] * 3 - 1] = self.io[self.wiring[index1] * 3 - 2]
         if self.components[self.wiring[index1]] == "NOT":
-            self.io[self.wiring[index1] * 3] = abs(self.io[self.wiring[index1] * 3 - 2] - 1)
+            self.io[self.wiring[index1] * 3] = (not self.io[self.wiring[index1] * 3 - 2]) + 0
         if self.components[self.wiring[index1]] == "AND":
-            self.io[self.wiring[index1] * 3] = self.io[self.wiring[index1] * 3 - 2] * self.io[self.wiring[index1] * 3 - 1]
+            self.io[self.wiring[index1] * 3] = (self.io[self.wiring[index1] * 3 - 2] and self.io[self.wiring[index1] * 3 - 1]) + 0
         if self.components[self.wiring[index1]] == "OR":
-            self.io[self.wiring[index1] * 3] = m.ceil((self.io[self.wiring[index1] * 3 - 2] + self.io[self.wiring[index1] * 3 - 1]) / 2)
+            self.io[self.wiring[index1] * 3] = (self.io[self.wiring[index1] * 3 - 2] or self.io[self.wiring[index1] * 3 - 1]) + 0
         if self.components[self.wiring[index1]] == "XOR":
             self.io[self.wiring[index1] * 3] = abs(self.io[self.wiring[index1] * 3 - 2] - self.io[self.wiring[index1] * 3 - 1])
         if self.components[self.wiring[index1]] == "NOR":
-            self.io[self.wiring[index1] * 3] = abs(m.ceil((self.io[self.wiring[index1] * 3 - 2] - self.io[self.wiring[index1] * 3 - 1]) / 2) - 1)
+            self.io[self.wiring[index1] * 3] = (not (self.io[self.wiring[index1] * 3 - 2] or self.io[self.wiring[index1] * 3 - 1])) + 0
         if self.components[self.wiring[index1]] == "NAND":
-            self.io[self.wiring[index1] * 3] = abs(self.io[self.wiring[index1] * 3 - 2] * self.io[self.wiring[index1] * 3 - 1] - 1)
+            self.io[self.wiring[index1] * 3] = (not (self.io[self.wiring[index1] * 3 - 2] and self.io[self.wiring[index1] * 3 - 1])) + 0
         self.wiring[index1 + 2] = self.io[self.wiring[index1] * 3]
         if self.inpComp[self.wiring[index2] * 3 - 1] == self.wiring[index1]:
             self.io[self.wiring[index1 + 1] * 3 - 2] = self.io[self.wiring[index1] * 3]
@@ -937,7 +943,7 @@ class master:
                 else:
                     self.sp.pencolor(themeColors[1 + self.theme], themeColors[2 + self.theme], themeColors[3 + self.theme])
                 if self.components[i] == "POWER":
-                    if self.io[i * 3] == 1:
+                    if self.io[i * 3 - 1] == 1:
                         if self.selectOb.count(i) > 0:
                             self.POWER(renderX, renderY, globalsize, self.positions[i * 3], 1, 1)
                         else:
