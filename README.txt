@@ -1,5 +1,7 @@
 Welcome to Logic Gates™
 
+download files and run python3 logicgates.py
+
 Create logic circuits by summoning components with keybinds and click and drag mechanics to wire and rearrange components.
 This project has support for 8 types of unique components with all the infinite possibilities of functional completeness
 
