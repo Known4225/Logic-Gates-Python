@@ -1,6 +1,10 @@
 Welcome to Logic Gates™
 
-download files and run python3 logicgates.py
+download files and run 
+
+python3 logicgates.py
+
+You can add -f and a filename to load in a file
 
 Create logic circuits by summoning components with keybinds and click and drag mechanics to wire and rearrange components.
 This project has support for 8 types of unique components with all the infinite possibilities of functional completeness
@@ -25,6 +29,8 @@ up and down arrows - zoom
 space + scroll wheel - rotate component (coarse)
 sideways arrows - rotate component (fine)
 space + sideways arrows - rotate selected (fine)
+k - export
+l - import (it's L and not i)
 h - toggle sidebar
 
 All the data for a Logic Gates™ setup is in just 5 lists, some of which store redundant information. File sizes are around 60 bytes per component.
