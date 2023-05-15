@@ -1,0 +1,21 @@
+To use:
+python3 logicgates.py -f 4bitALU.txt
+or
+python3 logicgates.py -f Two7SegmentDisplays.txt
+
+7 Segment Displays:
+Use the two 4 bit inputs at the top to change the number displayed
+
+4 bit ALU:
+Use the two four bit inputs at the top left to operate on
+Use the three bit selection bits to select an operation to output
+Select:
+000 - AND
+001 - OR
+010 - XOR
+011 - SHL
+100 - SHR
+101 - ADD
+110 - SUB
+111 - NOT BOUND
+It does every operation simultaneously and then uses a multiplexer to select the one to output
