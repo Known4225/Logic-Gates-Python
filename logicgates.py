@@ -381,7 +381,7 @@ class master:
                 else:
                     self.holding = 0
             for j in range(len(self.deleteQueue) - 1):
-                if self.selected.count(self.deleteQueue) > 0 and self.selectOb.count(self.deleteQueue) > 0:
+                if self.selected.count(self.deleteQueue[1]) > 0 and self.selectOb.count(self.deleteQueue[1]) > 0:
                     self.selected.remove(self.deleteQueue[1])
                     self.selectOb.remove(self.deleteQueue[1])
                     self.deleteQueue.pop(1)
